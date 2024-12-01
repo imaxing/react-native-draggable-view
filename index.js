@@ -1,9 +1,9 @@
 import React, { useRef, useEffect } from "react";
 import { Animated, PanResponder, Dimensions } from "react-native";
-const window = Dimensions.get("window");
 
 export default (props) => {
   const position = useRef(new Animated.ValueXY()).current;
+  const window = Dimensions.get("window");
 
   const panResponder = useRef(
     PanResponder.create({
