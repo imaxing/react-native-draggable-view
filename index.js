@@ -1,9 +1,26 @@
 import React, { useRef, useEffect } from "react";
 import { Animated, PanResponder, Dimensions } from "react-native";
+const window = Dimensions.get("window");
 
 export default (props) => {
   const position = useRef(new Animated.ValueXY()).current;
-  const window = Dimensions.get("window");
+
+  const boundary = useRef({
+    width: props.width,
+    height: props.height,
+  });
+
+  useEffect(() => {
+    boundary.current = {
+      width: props.width,
+      height: props.height,
+    };
+
+    position.setValue({
+      x: window.width - props.width,
+      y: position.y._offset,
+    });
+  }, [props.width, props.height]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -16,16 +33,15 @@ export default (props) => {
       },
       onPanResponderMove: (_, gestureState) => {
         const { dx, dy } = gestureState;
+        const { width, height } = boundary.current;
 
         let newX = position.x._offset + dx;
         let newY = position.y._offset + dy;
 
         if (newX < 0) newX = 0;
-        if (newX > window.width - props.width)
-          newX = window.width - props.width;
+        if (newX > window.width - width) newX = window.width - width;
         if (newY < 0) newY = 0;
-        if (newY > window.height - props.height)
-          newY = window.height - props.height;
+        if (newY > window.height - height) newY = window.height - height;
 
         position.setValue({
           x: newX - position.x._offset,
@@ -38,13 +54,6 @@ export default (props) => {
       },
     })
   ).current;
-
-  useEffect(() => {
-    position.setValue({
-      x: window.width - props.width,
-      y: position.y._offset,
-    });
-  }, [props.width, props.height]);
 
   return (
     <Animated.View
